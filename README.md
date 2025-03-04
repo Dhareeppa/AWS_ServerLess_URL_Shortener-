@@ -23,7 +23,7 @@ A fully serverless URL shortener built with **AWS Lambda, DynamoDB, API Gateway,
 🌐 **API Gateway:** RESTful API exposure  
 📦 **CI/CD:** GitHub Actions for automated deployment  
 
-![Architecture Diagram](https://your-architecture-image-link.com)
+![Architecture Diagram](https://d2908q01vomqb2.cloudfront.net/1b6453892473a467d07372d45eb05abc2031647a/2022/06/09/urlshortener-diagram.png)
 
 ---
 
