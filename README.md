@@ -1,4 +1,4 @@
-# 🚀 Serverless URL Shortener
+# 🚀 AWS Serverless URL Shortener
 
 ![AWS Serverless](https://img.shields.io/badge/AWS-Serverless-orange) ![Python](https://img.shields.io/badge/Python-3.x-blue) ![License](https://img.shields.io/badge/License-MIT-green)
 
