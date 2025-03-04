@@ -52,4 +52,22 @@ def lambda_handler(event, context):
                 "body": json.dumps({"error": f"Server error: {str(e)}"}),
                 "headers": {"Content-Type": "application/json"}
             }
-    # ... (GET and rest of code)
+    elif http_method == "GET":
+        try:
+            short_code = event.get["pathParameters"]["short_code"]
+            response = table.get_item(Key={"short_code": short_code})
+            item = response.get("Item")
+            if not item:
+                return {"statusCode": 404, "body": json.dumps({"error": "Not found"})}
+
+            return {
+                'statusCode': 301,
+                'headers': {'Location': item['original_url']},
+                'body': ''
+            }
+        except Exception as e:
+            return {
+                "statusCode": 500,
+                "body": json.dumps({"error": f"Server error: {str(e)}"})
+            }
+    return {'statusCode': 400, 'body': json.dumps({'error': 'Invalid method'})}
