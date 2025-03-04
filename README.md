@@ -1,4 +1,4 @@
-# ServerLess_URL_Shortener-
+# Serverless URL Shortener
 
 ## 🚀 Overview
 The **Serverless URL Shortener** is a highly scalable, cost-effective, and easy-to-deploy URL shortening service. Built using AWS Lambda, API Gateway, DynamoDB, and S3, it allows users to generate short URLs and track their usage without managing servers.
@@ -6,22 +6,23 @@ The **Serverless URL Shortener** is a highly scalable, cost-effective, and easy-
 ## 📌 Features
 - 🔗 Generate short URLs instantly
 - 📊 Track URL clicks and analytics
-- 🏗️ Fully serverless architecture (AWS Lambda, DynamoDB, API Gateway)
+- 🏗️ Fully serverless architecture (AWS Lambda, DynamoDB, API Gateway, S3)
 - 🔒 Secure and scalable
 - 📂 Custom domain support (optional)
 
 ## 🏗 Architecture
 The application consists of:
 - **API Gateway** – Exposes HTTP endpoints
-- **Lambda Functions** – Handles URL shortening and redirection
+- **Lambda Functions (Python)** – Handles URL shortening and redirection
 - **DynamoDB** – Stores original and shortened URLs
-- **S3 + CloudFront (Optional)** – Hosts static frontend
+- **S3 + CloudFront** – Hosts static frontend (HTML, JavaScript, CSS)
 
 ## 🛠️ Tech Stack
-- **Backend:** AWS Lambda (Python/Node.js)
+- **Frontend:** HTML, JavaScript (AJAX, Fetch API)
+- **Backend:** AWS Lambda (Python)
 - **Database:** AWS DynamoDB (NoSQL)
 - **API:** AWS API Gateway
-- **Frontend (Optional):** React.js + S3 + CloudFront
+- **Storage:** AWS S3 (Frontend Hosting)
 
 ## 🚀 Deployment
 ### Prerequisites
@@ -37,18 +38,29 @@ The application consists of:
    ```
 2. Install dependencies:
    ```sh
-   npm install  # or pip install -r requirements.txt (for Python)
+   pip install -r requirements.txt
    ```
 3. Deploy to AWS:
    ```sh
    serverless deploy  # Using Serverless Framework
    ```
+4. Upload frontend files (HTML, JS, CSS) to S3:
+   ```sh
+   aws s3 sync frontend/ s3://your-bucket-name --acl public-read
+   ```
 
 ## 🔥 Usage
-- **Shorten a URL:**
-  ```sh
-  curl -X POST https://your-api-gateway-url/shorten -d '{"url": "https://example.com"}'
+- **Shorten a URL (Frontend Example in JavaScript):**
+  ```js
+  fetch('https://your-api-gateway-url/shorten', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: 'https://example.com' })
+  })
+  .then(response => response.json())
+  .then(data => console.log('Short URL:', data.shortUrl));
   ```
+
 - **Redirect using Short URL:**
   ```sh
   curl -L https://your-api-gateway-url/{short_id}
