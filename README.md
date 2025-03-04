@@ -1,5 +1,4 @@
 # ServerLess_URL_Shortener-
-# Serverless URL Shortener
 
 ## 🚀 Overview
 The **Serverless URL Shortener** is a highly scalable, cost-effective, and easy-to-deploy URL shortening service. Built using AWS Lambda, API Gateway, DynamoDB, and S3, it allows users to generate short URLs and track their usage without managing servers.
