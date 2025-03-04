@@ -15,14 +15,13 @@ def generate_short_code(length=6):
     return "".join(random.choices(string.ascii_letters + string.digits, k=length))
 
 def lambda_handler(event, context):
-    http_method = event.get("httpMethod")  # Avoid KeyError
+    http_method = event.get("httpMethod")  # This is safe, returns None if missing
     if not http_method:
         return {
             "statusCode": 400,
             "body": json.dumps({"error": "Missing HTTP method"}),
             "headers": {"Content-Type": "application/json"}
         }
-
     if http_method == "POST":
         try:
             body = json.loads(event["body"])
@@ -53,5 +52,4 @@ def lambda_handler(event, context):
                 "body": json.dumps({"error": f"Server error: {str(e)}"}),
                 "headers": {"Content-Type": "application/json"}
             }
-
-    # ... (GET handler and rest of the code remains unchanged)
+    # ... (GET and rest of code)
