@@ -1,74 +1,128 @@
-# Serverless URL Shortener
+# 🚀 Serverless URL Shortener
 
-## 🚀 Overview
-The **Serverless URL Shortener** is a highly scalable, cost-effective, and easy-to-deploy URL shortening service. Built using AWS Lambda, API Gateway, DynamoDB, and S3, it allows users to generate short URLs and track their usage without managing servers.
+![AWS Serverless](https://img.shields.io/badge/AWS-Serverless-orange) ![Python](https://img.shields.io/badge/Python-3.x-blue) ![License](https://img.shields.io/badge/License-MIT-green)
+
+A fully serverless URL shortener built with **AWS Lambda, DynamoDB, API Gateway, and S3**. This project allows users to shorten long URLs and provides redirection functionality without managing servers.
+
+---
 
 ## 📌 Features
-- 🔗 Generate short URLs instantly
-- 📊 Track URL clicks and analytics
-- 🏗️ Fully serverless architecture (AWS Lambda, DynamoDB, API Gateway, S3)
-- 🔒 Secure and scalable
-- 📂 Custom domain support (optional)
+✅ Shorten long URLs instantly  
+✅ Redirect users using short URLs  
+✅ Serverless & auto-scalable architecture  
+✅ Secure & cost-effective solution  
+✅ Custom short URLs (Optional)  
+✅ URL Expiration & Analytics (Optional)  
+
+---
 
 ## 🏗 Architecture
-The application consists of:
-- **API Gateway** – Exposes HTTP endpoints
-- **Lambda Functions (Python)** – Handles URL shortening and redirection
-- **DynamoDB** – Stores original and shortened URLs
-- **S3 + CloudFront** – Hosts static frontend (HTML, JavaScript, CSS)
+🚀 **Frontend:** HTML & JavaScript (hosted on S3 + CloudFront)  
+🖥️ **Backend:** AWS Lambda (Python)  
+🗄️ **Database:** AWS DynamoDB  
+🌐 **API Gateway:** RESTful API exposure  
+📦 **CI/CD:** GitHub Actions for automated deployment  
 
-## 🛠️ Tech Stack
-- **Frontend:** HTML, JavaScript (AJAX, Fetch API)
-- **Backend:** AWS Lambda (Python)
-- **Database:** AWS DynamoDB (NoSQL)
-- **API:** AWS API Gateway
-- **Storage:** AWS S3 (Frontend Hosting)
+![Architecture Diagram](https://your-architecture-image-link.com)
 
-## 🚀 Deployment
-### Prerequisites
+---
+
+## 🛠 Tech Stack
+🔹 **Frontend:** HTML, JavaScript (Fetch API, AJAX)  
+🔹 **Backend:** AWS Lambda (Python)  
+🔹 **Database:** AWS DynamoDB (NoSQL)  
+🔹 **API:** AWS API Gateway  
+🔹 **Storage:** AWS S3 (Frontend Hosting)  
+🔹 **Deployment:** GitHub Actions  
+
+---
+
+## 🚀 Deployment Guide
+### 📝 Prerequisites
 - AWS Account
 - AWS CLI installed & configured
 - Serverless Framework or AWS SAM (optional)
 
-### Steps
-1. Clone the repository:
-   ```sh
-   git clone https://github.com/your-username/serverless-url-shortener.git
-   cd serverless-url-shortener
-   ```
-2. Install dependencies:
-   ```sh
-   pip install -r requirements.txt
-   ```
-3. Deploy to AWS:
-   ```sh
-   serverless deploy  # Using Serverless Framework
-   ```
-4. Upload frontend files (HTML, JS, CSS) to S3:
-   ```sh
-   aws s3 sync frontend/ s3://your-bucket-name --acl public-read
-   ```
-
-## 🔥 Usage
-- **Shorten a URL (Frontend Example in JavaScript):**
-  ```js
-  fetch('https://your-api-gateway-url/shorten', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url: 'https://example.com' })
-  })
-  .then(response => response.json())
-  .then(data => console.log('Short URL:', data.shortUrl));
-  ```
-
-- **Redirect using Short URL:**
-  ```sh
-  curl -L https://your-api-gateway-url/{short_id}
-  ```
-
-## 📜 License
-This project is open-source and available under the MIT License.
+### 🏗 Steps
+1️⃣ Clone the repository:
+```sh
+git clone https://github.com/your-username/serverless-url-shortener.git
+cd serverless-url-shortener
+```
+2️⃣ Install dependencies:
+```sh
+pip install -r lambda/requirements.txt -t lambda/
+```
+3️⃣ Deploy AWS Lambda:
+```sh
+cd lambda
+zip -r ../lambda.zip .
+aws lambda update-function-code --function-name <your-lambda-name> --zip-file fileb://../lambda.zip
+```
+4️⃣ Deploy Frontend to S3:
+```sh
+aws s3 sync frontend/ s3://url-shortener-frontend/
+```
 
 ---
-💡 Contributions and PRs are welcome!
+
+## 🔥 Usage
+### 🌍 Shorten a URL (Frontend Example in JavaScript)
+```js
+async function shortenUrl() {
+    const url = document.getElementById('url').value;
+    const response = await fetch('https://<your-api-id>.execute-api.<region>.amazonaws.com/prod/shorten', {
+        method: 'POST',
+        body: JSON.stringify({ url }),
+        headers: { 'Content-Type': 'application/json' }
+    });
+    const data = await response.json();
+    document.getElementById('result').innerText = data.short_url || data.error;
+}
+```
+
+### ⚡ Lambda Function (Python)
+```python
+import json
+import boto3
+import random
+import string
+import urllib.parse
+
+dynamodb = boto3.resource("dynamodb")
+table = dynamodb.Table("UrlMappings")
+
+def lambda_handler(event, context):
+    if event["httpMethod"] == "POST":
+        body = json.loads(event["body"])
+        original_url = body.get("url")
+        short_code = "".join(random.choices(string.ascii_letters + string.digits, k=6))
+        table.put_item(Item={"short_code": short_code, "original_url": original_url})
+        short_url = f"https://{event['requestContext']['domainName']}/{short_code}"
+        return {"statusCode": 200, "body": json.dumps({"short_url": short_url})}
+```
+
+---
+
+## 📌 Enhanced Features (Optional)
+### ✨ Custom Short URLs
+- Allow users to specify custom short codes.
+- Validate uniqueness in DynamoDB.
+
+### ⏳ URL Expiration
+- Set an expiration date for shortened URLs.
+- Validate expiration before redirection.
+
+### 📊 Analytics
+- Track the number of clicks on each short URL.
+- Store and update click counts in DynamoDB.
+
+---
+
+## 📜 License
+This project is open-source and available under the **MIT License**.
+
+---
+
+💡 **Contributions and PRs are welcome!** Feel free to enhance the project with new features or improvements. 🚀
 
