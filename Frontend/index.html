@@ -1,55 +1,142 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>URL Shortener</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery for AJAX requests -->
     <style>
         body {
-            background-color: #212f3d;
-            margin: 0vw;
-        }
-        div {
-            margin-top: 2vw;
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fb;
             display: flex;
-            align-items: center;
             justify-content: center;
-            gap: 1vw;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
         }
+
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: #0056b3;
+        }
+
         button {
-            min-height: 1.8vw;
-            border-radius: 5px;
-            min-width: 10vw;
-            background-color: green;
+            width: 100%;
+            padding: 10px;
+            background-color: #0056b3;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
         }
-        input {
-            min-height: 1.5vw;
-            border-radius: 5px;
-            min-width: 50vw;
+
+        button:hover {
+            background-color: #003d82;
         }
-        #result {
-            color: white; /* Change output text color to white */
-            margin-top: 1vw; /* Add some spacing */
-            text-align: center; /* Center the result */
+
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 16px;
+            color: #555;
+            display: none;
+        }
+
+        .result.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .result.error {
+            background-color: #f8d7da;
+            color: #721c24;
         }
     </style>
 </head>
 <body>
-    <div>
-        <input id="url" type="text" placeholder="Enter URL" />
-        <button onclick="shortenUrl()">Shorten</button>
-        <p id="result"></p>
+    <div class="container">
+        <h1>URL Shortener</h1>
+        <form id="shortenForm">
+            <label for="url">Enter URL:</label>
+            <input type="text" id="url" name="url" placeholder="Enter the URL to shorten" required />
+            <button type="submit">Shorten</button>
+        </form>
+
+        <div class="result" id="result">
+            <p id="shortenedUrl"></p>
+        </div>
     </div>
 
     <script>
-        async function shortenUrl() {
-            const url = document.getElementById('url').value;
-            const response = await fetch('https://<your-api-id>.execute-api.<region>.amazonaws.com/prod/shorten', {
-                method: 'POST',
-                body: JSON.stringify({ url }),
-                headers: { 'Content-Type': 'application/json' }
+        $(document).ready(function() {
+            // When the form is submitted
+            $('#shortenForm').on('submit', function(event) {
+                event.preventDefault(); // Prevent form submission
+
+                // Get the URL input from the form
+                var url = $('#url').val();
+
+                // Reset the result container
+                $('#result').hide().removeClass('success error');
+                $('#shortenedUrl').text('');
+
+                // Make the API call to the Lambda function
+                $.ajax({
+                    url: 'https://your-api-gateway-id.execute-api.region.amazonaws.com/your-endpoint', // Replace with your actual API Gateway URL
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ "url": url }),  // Send the original URL to Lambda
+                    success: function(response) {
+                        // If the response is successful, display the shortened URL
+                        $('#shortenedUrl').text(response.short_url);
+                        $('#result').addClass('success').show();
+                    },
+                    error: function(error) {
+                        // Handle error (e.g., invalid URL or DynamoDB issue)
+                        $('#shortenedUrl').text("Error: " + error.responseText);
+                        $('#result').addClass('error').show();
+                    }
+                });
             });
-            const data = await response.json();
-            document.getElementById('result').innerText = data.short_url || data.error;
-        }
+        });
     </script>
 </body>
 </html>
