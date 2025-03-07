@@ -23,7 +23,8 @@ A fully **serverless URL shortener** built using **AWS Lambda, DynamoDB, API Gat
 🗄️ **Database:** AWS DynamoDB  
 🌐 **API Gateway:** RESTful API exposure  
 📦 **CI/CD:** GitHub Actions for automated deployment 
-![Serverless Architecture](https://www.google.com/url?sa=i&url=https%3A%2F%2Faws.amazon.com%2Fblogs%2Fcompute%2Fbuild-a-serverless-private-url-shortener%2F&psig=AOvVaw3pyMENtlvE-kdiHJRZfjSy&ust=1741446446068000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCPCawdef-IsDFQAAAAAdAAAAABAE)
+![Serverless Architecture](https://d2908q01vomqb2.cloudfront.net/1b6453892473a467d07372d45eb05abc2031647a/2022/06/09/urlshortener-diagram.png)
+
 
 ### **📌 How It Works:**  
 1️⃣ **User submits a long URL** via the frontend.  
