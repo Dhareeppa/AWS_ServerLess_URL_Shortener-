@@ -51,9 +51,9 @@ def lambda_handler(event, context):
                 "body": json.dumps({"massage": "Redirecting...."})
             }
         else:
-            return{"Statuscode": 404, "body": json.dumps({"error": "short url not found"})}
+            return{"Statuscode": 404, "body": json.dumps({"error": "short url not found..."})}
     else:
-        return {"statuscode": 405, "body": json.dumps({"error": "Method is Not Allowed"})}
+        return {"statuscode": 405, "body": json.dumps({"error": "Method is Not Allowed..."})}
 
 
 
