@@ -3,140 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>URL Shortener</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery for AJAX requests -->
+    <title>Serverless URL Shortener</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f7fb;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-
-        .container {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            width: 100%;
-            max-width: 500px;
-        }
-
-        h1 {
+            font-family: Arial, sans-serif;
             text-align: center;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 500px;
+            background: white;
+            padding: 20px;
+            margin: 50px auto;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        h2 {
             color: #333;
-            margin-bottom: 20px;
         }
-
-        label {
-            font-size: 14px;
-            color: #555;
-            margin-bottom: 8px;
-            display: block;
-        }
-
-        input[type="text"] {
-            width: 100%;
+        input {
+            width: 80%;
             padding: 10px;
-            font-size: 16px;
-            border: 2px solid #ccc;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            outline: none;
-            transition: border-color 0.3s ease;
+            border: 1px solid #ccc;
+            border-radius: 5px;
         }
-
-        input[type="text"]:focus {
-            border-color: #0056b3;
-        }
-
         button {
-            width: 100%;
-            padding: 10px;
-            background-color: #0056b3;
-            color: white;
-            font-size: 16px;
+            padding: 10px 15px;
             border: none;
-            border-radius: 4px;
+            background-color: #007BFF;
+            color: white;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            border-radius: 5px;
+            margin-top: 10px;
         }
-
         button:hover {
-            background-color: #003d82;
+            background-color: #0056b3;
         }
-
-        .result {
+        .short-url {
             margin-top: 20px;
             padding: 10px;
-            background-color: #f9f9f9;
-            border-radius: 4px;
-            text-align: center;
-            font-size: 16px;
-            color: #555;
-            display: none;
+            background: #dff0d8;
+            border: 1px solid #4cae4c;
+            display: inline-block;
+            border-radius: 5px;
         }
-
-        .result.success {
-            background-color: #d4edda;
-            color: #155724;
+        .copy-btn {
+            background-color: #28a745;
+            padding: 5px 10px;
+            border: none;
+            color: white;
+            cursor: pointer;
+            margin-left: 10px;
+            border-radius: 5px;
         }
-
-        .result.error {
-            background-color: #f8d7da;
-            color: #721c24;
+        .copy-btn:hover {
+            background-color: #218838;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>URL Shortener</h1>
-        <form id="shortenForm">
-            <label for="url">Enter URL:</label>
-            <input type="text" id="url" name="url" placeholder="Enter the URL to shorten" required />
-            <button type="submit">Shorten</button>
-        </form>
 
-        <div class="result" id="result">
-            <p id="shortenedUrl"></p>
-        </div>
+    <div class="container">
+        <h2>🔗 URL Shortener</h2>
+
+        <input type="text" id="long-url" placeholder="Enter URL to shorten">
+        <button onclick="shortenURL()">Shorten</button>
+
+        <div id="result"></div>
     </div>
 
     <script>
-        $(document).ready(function() {
-            // When the form is submitted
-            $('#shortenForm').on('submit', function(event) {
-                event.preventDefault(); // Prevent form submission
+        const API_URL = "https://abcd1234.execute-api.us-east-1.amazonaws.com/prod"; // Replace with your API Gateway URL
 
-                // Get the URL input from the form
-                var url = $('#url').val();
+        async function shortenURL() {
+            const longUrl = document.getElementById("long-url").value;
+            if (!longUrl) {
+                alert("Please enter a valid URL");
+                return;
+            }
 
-                // Reset the result container
-                $('#result').hide().removeClass('success error');
-                $('#shortenedUrl').text('');
-
-                // Make the API call to the Lambda function
-                $.ajax({
-                    url: 'https://your-api-gateway-id.execute-api.region.amazonaws.com/your-endpoint', // Replace with your actual API Gateway URL
-                    method: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ "url": url }),  // Send the original URL to Lambda
-                    success: function(response) {
-                        // If the response is successful, display the shortened URL
-                        $('#shortenedUrl').text(response.short_url);
-                        $('#result').addClass('success').show();
-                    },
-                    error: function(error) {
-                        // Handle error (e.g., invalid URL or DynamoDB issue)
-                        $('#shortenedUrl').text("Error: " + error.responseText);
-                        $('#result').addClass('error').show();
-                    }
-                });
+            const response = await fetch(`${API_URL}/shorten`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ long_url: longUrl }),
             });
-        });
+
+            const data = await response.json();
+            if (response.ok) {
+                const shortUrl = `${window.location.origin}/${data.short_url}`;
+                document.getElementById("result").innerHTML = `
+                    <div class="short-url">
+                        <a id="shortened-url" href="${shortUrl}" target="_blank">${shortUrl}</a>
+                        <button class="copy-btn" onclick="copyToClipboard('${shortUrl}')">Copy</button>
+                    </div>`;
+            } else {
+                document.getElementById("result").innerHTML = `<p style="color: red;">Error: ${data.error}</p>`;
+            }
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Copied to clipboard!");
+            }).catch(err => {
+                console.error("Failed to copy:", err);
+            });
+        }
     </script>
+
 </body>
 </html>
